@@ -47,7 +47,7 @@ public class UserData implements Parcelable {
     @SerializedName("projects_count")
     private int mProjectsCount;
     @SerializedName("rebounds_received_count")
-    private int mReboundsReceivedCound;
+    private int mReboundsReceivedCount;
     @SerializedName("shots_count")
     private int mShotsCount;
     @SerializedName("teams_count")
@@ -81,7 +81,7 @@ public class UserData implements Parcelable {
         this.mLikesCount = in.readInt();
         this.mLikesReceivedCountCount = in.readInt();
         this.mProjectsCount = in.readInt();
-        this.mReboundsReceivedCound = in.readInt();
+        this.mReboundsReceivedCount = in.readInt();
         this.mShotsCount = in.readInt();
         this.mTeamsCount = in.readInt();
         this.mCanUploadCount = in.readByte() != 0;
@@ -205,12 +205,12 @@ public class UserData implements Parcelable {
         mProjectsCount = projectsCount;
     }
 
-    public int getReboundsReceivedCound() {
-        return mReboundsReceivedCound;
+    public int getReboundsReceivedCount() {
+        return mReboundsReceivedCount;
     }
 
-    public void setReboundsReceivedCound(int reboundsReceivedCound) {
-        mReboundsReceivedCound = reboundsReceivedCound;
+    public void setReboundsReceivedCount(int reboundsReceivedCount) {
+        mReboundsReceivedCount = reboundsReceivedCount;
     }
 
     public int getShotsCount() {
@@ -290,7 +290,7 @@ public class UserData implements Parcelable {
         dest.writeInt(this.mLikesCount);
         dest.writeInt(this.mLikesReceivedCountCount);
         dest.writeInt(this.mProjectsCount);
-        dest.writeInt(this.mReboundsReceivedCound);
+        dest.writeInt(this.mReboundsReceivedCount);
         dest.writeInt(this.mShotsCount);
         dest.writeInt(this.mTeamsCount);
         dest.writeByte(mCanUploadCount ? (byte) 1 : (byte) 0);

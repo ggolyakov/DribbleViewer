@@ -1,5 +1,7 @@
 package com.woolf.dribbleviewer.rest.models;
 
+import android.util.Log;
+
 import com.woolf.dribbleviewer.data.ShotData;
 import com.woolf.dribbleviewer.rest.ApiFactory;
 import com.woolf.dribbleviewer.rest.results.Pair;
@@ -20,8 +22,7 @@ public class ShotsModel extends BaseModel {
     }
 
     private Pair<List<ShotData>> saveUserModel(List<ShotData> result) {
-        result.toString();
-        return new Pair<>(null, null);
+        return new Pair<>(result, null);
     }
 
     private void createObservable(HashMap<String, String> params) {
@@ -54,11 +55,13 @@ public class ShotsModel extends BaseModel {
     }
 
     private void success(Pair<List<ShotData>> user) {
+        Log.e("REST","Success");
         onCompleted(user);
         clearRequestParams();
     }
 
     private void error(Throwable throwable) {
+        Log.e("REST","error");
         onError(throwable);
         clearRequestParams();
     }

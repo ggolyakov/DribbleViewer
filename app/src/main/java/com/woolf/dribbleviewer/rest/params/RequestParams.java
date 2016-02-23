@@ -1,7 +1,5 @@
 package com.woolf.dribbleviewer.rest.params;
 
-import com.woolf.dribbleviewer.data.ShotData;
-
 import java.util.HashMap;
 
 
@@ -14,7 +12,7 @@ public class RequestParams {
         HashMap<String, String> params = new HashMap<>(6);
         params.put("page", Integer.toString(PAGE));
         params.put("per_page", Integer.toString(COUNT_SHOTS));
-        params.put("sort", ShotData.SORT_RECENT);
+//        params.put("sort", ShotData.SORT_RECENT);
 
         return params;
 

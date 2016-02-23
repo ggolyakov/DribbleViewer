@@ -2,9 +2,12 @@ package com.woolf.dribbleviewer.main;
 
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
+import com.woolf.dribbleviewer.DribbleApplication;
 import com.woolf.dribbleviewer.R;
 import com.woolf.dribbleviewer.base.BaseActivity;
 import com.woolf.dribbleviewer.data.ShotData;
@@ -20,10 +23,7 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-/**
- * Created by WoOLf on 23.02.2016.
- */
-public class MainActivity extends BaseActivity implements IRestObserver {
+public class ShotListActivity extends BaseActivity implements IRestObserver, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String SHOT_LIST = "MainActivity.SHOT_LIST";
 
@@ -40,13 +40,19 @@ public class MainActivity extends BaseActivity implements IRestObserver {
 
     private ArrayList<ShotData> mShotList;
 
+    private ShotsListAdapter mListAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+
+
         initToolbar();
+        initAdapters();
+        setListeners();
 
         mShotsModel = getRequestFragment().getShotsModel();
         mShotsRequestId = mShotsModel.addObserver(this);
@@ -70,6 +76,14 @@ public class MainActivity extends BaseActivity implements IRestObserver {
         super.onRestoreInstanceState(savedInstanceState);
     }
 
+    private void initAdapters() {
+        mListAdapter = new ShotsListAdapter();
+        LinearLayoutManager manager = new LinearLayoutManager(DribbleApplication.APP_CONTEXT);
+
+        rvShots.setAdapter(mListAdapter);
+        rvShots.setLayoutManager(manager);
+    }
+
     private void reloadList() {
 
     }
@@ -80,6 +94,11 @@ public class MainActivity extends BaseActivity implements IRestObserver {
 
     private void initToolbar() {
         setSupportActionBar(toolbar);
+    }
+
+    private void setListeners(){
+        srlReload.setOnRefreshListener(this);
+
     }
 
     @Override
@@ -98,7 +117,8 @@ public class MainActivity extends BaseActivity implements IRestObserver {
     @Override
     public void onCompleted(int request_id, Pair object) {
         if (mShotsRequestId == request_id) {
-
+            ArrayList<ShotData> data = (ArrayList<ShotData>) object.getValue();
+            mListAdapter.setData(data);
         }
     }
 
@@ -114,5 +134,10 @@ public class MainActivity extends BaseActivity implements IRestObserver {
         if (mShotsRequestId == request_id) {
 
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        rvShots.setLayoutManager(new GridLayoutManager(DribbleApplication.APP_CONTEXT,2));
     }
 }
