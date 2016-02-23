@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">"Dribble Viewer "</string>
+
+    <string name="client_id">8eeccec30c59120834f84bd3ea8100148e9048582cb9e4b01cfa4b45fdd5678b</string>
+    <string name="client_secret">279adf8482d11668804346fa72ef11b85d3abb98cc0943c4eaf4ea11db8701a7</string>
+    <string name="client_access_token">37c100e904fcaab62828eb401ad6d90e36623f34cb61114e2332ca236e91d239</string>
+</resources>
