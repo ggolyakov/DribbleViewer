@@ -1,6 +1,6 @@
 package com.woolf.dribbleviewer.rest.service;
 
-import com.woolf.dribbleviewer.data.ShotData;
+import com.woolf.dribbleviewer.models.ShotData;
 import com.woolf.dribbleviewer.rest.Urls;
 
 import java.util.HashMap;

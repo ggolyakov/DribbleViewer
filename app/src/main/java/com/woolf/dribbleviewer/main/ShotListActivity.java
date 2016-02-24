@@ -10,7 +10,7 @@ import android.support.v7.widget.Toolbar;
 import com.woolf.dribbleviewer.DribbleApplication;
 import com.woolf.dribbleviewer.R;
 import com.woolf.dribbleviewer.base.BaseActivity;
-import com.woolf.dribbleviewer.data.ShotData;
+import com.woolf.dribbleviewer.models.ShotData;
 import com.woolf.dribbleviewer.rest.listeners.IRestObserver;
 import com.woolf.dribbleviewer.rest.listeners.Status;
 import com.woolf.dribbleviewer.rest.managers.ErrorHandler;

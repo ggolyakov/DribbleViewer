@@ -1,4 +1,4 @@
-package com.woolf.dribbleviewer.data;
+package com.woolf.dribbleviewer.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

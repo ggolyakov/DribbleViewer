@@ -1,4 +1,4 @@
-package com.woolf.dribbleviewer.data;
+package com.woolf.dribbleviewer.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -24,6 +24,12 @@ public class ShotImagesData implements Parcelable {
     private String mTeaser;
 
     public ShotImagesData() {
+    }
+
+    public ShotImagesData(String hiDpi, String normal, String teaser) {
+        mHiDpi = hiDpi;
+        mNormal = normal;
+        mTeaser = teaser;
     }
 
     protected ShotImagesData(Parcel in) {

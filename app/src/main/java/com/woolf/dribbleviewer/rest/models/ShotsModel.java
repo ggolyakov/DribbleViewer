@@ -2,11 +2,14 @@ package com.woolf.dribbleviewer.rest.models;
 
 import android.util.Log;
 
-import com.woolf.dribbleviewer.data.ShotData;
+import com.woolf.dribbleviewer.DribbleApplication;
+import com.woolf.dribbleviewer.db.DribbleDatabaseHelper;
+import com.woolf.dribbleviewer.models.ShotData;
 import com.woolf.dribbleviewer.rest.ApiFactory;
 import com.woolf.dribbleviewer.rest.results.Pair;
 import com.woolf.dribbleviewer.rest.service.ShotsService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,15 +24,31 @@ public class ShotsModel extends BaseModel {
         super();
     }
 
-    private Pair<List<ShotData>> saveUserModel(List<ShotData> result) {
+    private Pair<List<ShotData>> saveList(List<ShotData> result) {
+        DribbleDatabaseHelper.getInstance(DribbleApplication.APP_CONTEXT).addValues(result);
         return new Pair<>(result, null);
+    }
+
+    private List<ShotData> filter(List<ShotData> shotDataList) {
+        ArrayList<ShotData> result = new ArrayList<>();
+        for (ShotData data : shotDataList) {
+            if (result.size() < 50) {
+                if (!data.isAnimated()) {
+                    result.add(data);
+                }
+            } else {
+                break;
+            }
+        }
+        return result;
     }
 
     private void createObservable(HashMap<String, String> params) {
         ShotsService service = ApiFactory.shots();
         if (mObservable == null) {
             mObservable = service.getShots(params)
-                    .map(this::saveUserModel)
+                    .map(this::filter)
+                    .map(this::saveList)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .cache();

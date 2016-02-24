@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.woolf.dribbleviewer.R;
-import com.woolf.dribbleviewer.data.ShotData;
+import com.woolf.dribbleviewer.models.ShotData;
 
 import java.util.ArrayList;
 
@@ -77,7 +77,6 @@ public class ShotsListAdapter extends RecyclerView.Adapter<ShotsListAdapter.View
             Uri uri = Uri.parse(url);
             view.setImageURI(uri);
             view.setAspectRatio((float) data.getWidth() / data.getHeight());
-            view.animate();
         }
     }
 
