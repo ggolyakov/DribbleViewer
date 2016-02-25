@@ -40,7 +40,7 @@ public class DribbleDatabaseHelper extends SQLiteOpenHelper implements DatabaseK
     }
 
     private void createItemsTable(SQLiteDatabase db) {
-        db.execSQL(CREATE_ITEMS_TABLE);
+        db.execSQL(CREATE_SHOTS_TABLE);
     }
 
 //    public int getHeadRecord() {

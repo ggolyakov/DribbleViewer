@@ -2,9 +2,6 @@ package com.woolf.dribbleviewer.db;
 
 import android.provider.BaseColumns;
 
-/**
- * Created by WoOLf on 24.02.2016.
- */
 public interface DatabaseKeys extends BaseColumns {
     String SHOTS_TABLE = "shots_table";
 
@@ -21,7 +18,7 @@ public interface DatabaseKeys extends BaseColumns {
     String IMG_WIDTH    = "img_width";
 
 
-    String CREATE_ITEMS_TABLE = String.format(
+    String CREATE_SHOTS_TABLE = String.format(
             "CREATE TABLE %1$s (" +                                         //SHOTS_TABLE
                     " %2$s INTEGER PRIMARY KEY  AUTOINCREMENT" +            //_ID
                     ",%3$s INTEGER" +                                       // ID_SHOT

@@ -5,6 +5,11 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.woolf.dribbleviewer.DribbleApplication;
 import com.woolf.dribbleviewer.R;
@@ -34,6 +39,15 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     RecyclerView rvShots;
     @Bind(R.id.srl_main)
     SwipeRefreshLayout srlReload;
+
+    @Bind(R.id.rl_progress)
+    RelativeLayout rlProgress;
+    @Bind(R.id.pb_load)
+    ProgressBar pbLoad;
+    @Bind(R.id.ll_progress_error)
+    LinearLayout llError;
+    @Bind(R.id.tv_progress_error)
+    TextView tvError;
 
     private ShotsModel mShotsModel;
     private int mShotsRequestId;
@@ -126,10 +140,19 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     @Override
     public void onStartLoading(int request_id) {
         if(mDbRequestId == request_id){
-            Log.e("TAG","DB OnStart");
+            if (mShotList == null) {
+                rlProgress.setVisibility(View.VISIBLE);
+                pbLoad.setVisibility(View.VISIBLE);
+                llError.setVisibility(View.GONE);
+            }
         }
         if (mShotsRequestId == request_id) {
-            Log.e("TAG","SHOTS OnStart");
+            if (mShotList == null) {
+                rlProgress.setVisibility(View.VISIBLE);
+                pbLoad.setVisibility(View.VISIBLE);
+                llError.setVisibility(View.GONE);
+
+            }
         }
 
     }
@@ -143,12 +166,14 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
             }else {
                 ArrayList<ShotData> data = (ArrayList<ShotData>) object.getValue();
                 mListAdapter.setData(data);
+                rlProgress.setVisibility(View.GONE);
             }
         }
         if (mShotsRequestId == request_id) {
             Log.e("TAG","SHOTS onCompleted");
             ArrayList<ShotData> data = (ArrayList<ShotData>) object.getValue();
             mListAdapter.setData(data);
+            rlProgress.setVisibility(View.GONE);
         }
     }
 
@@ -157,19 +182,32 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
 
         if(mDbRequestId == request_id){
             Log.e("TAG", "DB onError");
+            pbLoad.setVisibility(View.INVISIBLE);
+            llError.setVisibility(View.VISIBLE);
         }
         if (mShotsRequestId == request_id) {
-            Log.e("TAG", "SHOTS onError");
+            pbLoad.setVisibility(View.INVISIBLE);
+            llError.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void onChangeStatus(int request_id, Status status) {
+        Log.e("TAG", "SHOTS onChangeStatus");
         if(mDbRequestId == request_id){
-            Log.e("TAG", "DB onChangeStatus");
+            if (status == Status.IN_PROGRESS) {
+                rlProgress.setVisibility(View.VISIBLE);
+                pbLoad.setVisibility(View.VISIBLE);
+                llError.setVisibility(View.GONE);
+            }
         }
         if (mShotsRequestId == request_id) {
             Log.e("TAG", "SHOTS onChangeStatus");
+            if (status == Status.IN_PROGRESS) {
+                rlProgress.setVisibility(View.VISIBLE);
+                pbLoad.setVisibility(View.VISIBLE);
+                llError.setVisibility(View.GONE);
+            }
         }
     }
 
