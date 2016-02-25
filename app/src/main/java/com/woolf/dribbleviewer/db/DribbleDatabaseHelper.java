@@ -43,10 +43,7 @@ public class DribbleDatabaseHelper extends SQLiteOpenHelper implements DatabaseK
         db.execSQL(CREATE_SHOTS_TABLE);
     }
 
-//    public int getHeadRecord() {
-//        return ItemDatabaseManager.getIdFirsRecord(mInstance);
-//    }
-//
+
     public void addValues(List<ShotData> shotDataList){
          DribbleDatabaseManager.fillDatabaseFromList(mInstance, shotDataList);
     }
@@ -55,13 +52,11 @@ public class DribbleDatabaseHelper extends SQLiteOpenHelper implements DatabaseK
         return DribbleDatabaseManager.getList(mInstance);
     }
 
-//    public List<ShotData> loadFromDatabase(){
-//        return DribbleDatabaseManager.fillListFromDatabase(mInstance);
-//    }
-//
-//    public boolean updateDatabase(int fromId, int toId, boolean isMovedUp){
-//        return ItemDatabaseManager.updateDatabase(fromId, toId, isMovedUp, mInstance);
-//    }
+    public void clearShotsTabe(){
+         DribbleDatabaseManager.clearTable(mInstance);
+    }
+
+
 
     public static void destroy(){
         mInstance = null;

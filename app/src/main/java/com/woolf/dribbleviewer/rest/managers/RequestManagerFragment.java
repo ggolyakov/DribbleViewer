@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.woolf.dribbleviewer.rest.models.DataBaseModel;
 import com.woolf.dribbleviewer.rest.models.ShotsModel;
+import com.woolf.dribbleviewer.rest.params.Constants;
 
 public class RequestManagerFragment extends Fragment {
 
@@ -13,6 +14,8 @@ public class RequestManagerFragment extends Fragment {
 
     private ShotsModel mShotsModel;
     private DataBaseModel mDBModel;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -25,7 +28,7 @@ public class RequestManagerFragment extends Fragment {
      */
     public ShotsModel getShotsModel() {
         if (mShotsModel == null) {
-            mShotsModel = new ShotsModel();
+            mShotsModel = new ShotsModel(Constants.SHOTS_REQUEST_ID);
         }
         return mShotsModel;
     }
@@ -39,7 +42,7 @@ public class RequestManagerFragment extends Fragment {
      */
     public DataBaseModel getDBModel() {
         if (mDBModel == null) {
-            mDBModel = new DataBaseModel();
+            mDBModel = new DataBaseModel(Constants.DB_REQUEST_ID);
         }
         return mDBModel;
     }

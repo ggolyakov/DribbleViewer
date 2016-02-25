@@ -16,8 +16,8 @@ import rx.schedulers.Schedulers;
 public class DataBaseModel extends BaseModel {
     private Observable<Pair<List<ShotData>>> mObservable;
 
-    public DataBaseModel() {
-        super();
+    public DataBaseModel(int requestId) {
+        super(requestId);
     }
 
     private Pair<List<ShotData>> convert(List<ShotData> list){

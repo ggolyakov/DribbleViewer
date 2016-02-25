@@ -21,9 +21,6 @@ public class ShotsListAdapter extends RecyclerView.Adapter<ShotsListAdapter.View
     OnItemClickListener mItemClickListener;
     private ArrayList<ShotData> mShotList;
 
-    public ShotsListAdapter() {
-    }
-
 
     public ShotsListAdapter(ArrayList<ShotData> data) {
         mShotList = data;
@@ -33,8 +30,7 @@ public class ShotsListAdapter extends RecyclerView.Adapter<ShotsListAdapter.View
         this.mItemClickListener = mItemClickListener;
     }
 
-    public void setData(ArrayList<ShotData> data) {
-        mShotList = data;
+    public void notyfiChanged() {
         notifyDataSetChanged();
     }
 

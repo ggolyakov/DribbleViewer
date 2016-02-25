@@ -6,7 +6,6 @@ import com.woolf.dribbleviewer.rest.managers.ErrorHandler;
 import com.woolf.dribbleviewer.rest.results.Pair;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import rx.Subscription;
 import rx.subscriptions.Subscriptions;
@@ -21,14 +20,14 @@ public abstract class BaseModel {
 
     private ArrayList<IRestObserver> mRestObservers = new ArrayList<>();
 
-    public BaseModel() {
-        mRequestId = new Random().nextInt(1_000_000);
+    public BaseModel(int requestId) {
+        mRequestId =requestId;
     }
 
     protected abstract void subscribe();
 
 
-    public int addObserver(IRestObserver observer) {
+    public void addObserver(IRestObserver observer) {
         if (observer == null) {
             throw new NullPointerException("observer == null");
         }
@@ -37,7 +36,6 @@ public abstract class BaseModel {
                 mRestObservers.add(observer);
         }
         notifyChangeStatus();
-        return mRequestId;
     }
 
     public synchronized void deleteObserver(IRestObserver observer) {
