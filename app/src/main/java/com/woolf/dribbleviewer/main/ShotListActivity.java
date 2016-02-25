@@ -103,7 +103,6 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     private void reloadList() {
         mPage = 1;
         srlReload.setRefreshing(true);
-        clearList();
         mShotsModel.load(mPage);
     }
 
@@ -203,6 +202,9 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         }
         if (Constants.SHOTS_REQUEST_ID == request_id) {
             Log.e("TAG","SHOTS onCompleted");
+            if(mPage == 1){
+                clearList();
+            }
             ArrayList<ShotData> data = (ArrayList<ShotData>) object.getValue();
             fillList(data);
             mPage++;
