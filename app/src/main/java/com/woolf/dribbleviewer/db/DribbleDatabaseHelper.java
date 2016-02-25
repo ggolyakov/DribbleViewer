@@ -8,6 +8,8 @@ import com.woolf.dribbleviewer.models.ShotData;
 
 import java.util.List;
 
+import rx.Observable;
+
 
 public class DribbleDatabaseHelper extends SQLiteOpenHelper implements DatabaseKeys {
 
@@ -49,9 +51,13 @@ public class DribbleDatabaseHelper extends SQLiteOpenHelper implements DatabaseK
          DribbleDatabaseManager.fillDatabaseFromList(mInstance, shotDataList);
     }
 
-    public List<ShotData> loadFromDatabase(){
-        return DribbleDatabaseManager.fillListFromDatabase(mInstance);
+    public Observable<List<ShotData>> loadFromDatabase(){
+        return DribbleDatabaseManager.getList(mInstance);
     }
+
+//    public List<ShotData> loadFromDatabase(){
+//        return DribbleDatabaseManager.fillListFromDatabase(mInstance);
+//    }
 //
 //    public boolean updateDatabase(int fromId, int toId, boolean isMovedUp){
 //        return ItemDatabaseManager.updateDatabase(fromId, toId, isMovedUp, mInstance);

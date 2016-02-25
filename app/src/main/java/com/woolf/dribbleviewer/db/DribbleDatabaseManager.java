@@ -9,6 +9,10 @@ import com.woolf.dribbleviewer.models.ShotImagesData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+
+import rx.Observable;
+import rx.Subscriber;
 
 
 public class DribbleDatabaseManager implements DatabaseKeys {
@@ -50,8 +54,29 @@ public class DribbleDatabaseManager implements DatabaseKeys {
         } else {
             return null;
         }
+        cursor.close();
+        databaseHelper.close();
         return data;
     }
+
+    private static <T> Observable<T> makeObservable(final Callable<T> func) {
+        return Observable.create(
+                new Observable.OnSubscribe<T>() {
+                    @Override
+                    public void call(Subscriber<? super T> subscriber) {
+                        try {
+                            subscriber.onNext(func.call());
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+    }
+
+    public static Observable<List<ShotData>> getList(DribbleDatabaseHelper helper) {
+        return makeObservable(() -> fillListFromDatabase(helper));
+    }
+
 
     private static ShotData parseCursor(Cursor cursor) {
         ShotData data = new ShotData();
@@ -66,6 +91,8 @@ public class DribbleDatabaseManager implements DatabaseKeys {
         int imgHDpiIndex = cursor.getColumnIndex(IMG_HI_DPI);
         int imgNormalIndex = cursor.getColumnIndex(IMG_NORMAL);
         int imgTeaserIndex = cursor.getColumnIndex(IMG_TEASER);
+        int imgHeightIndex = cursor.getColumnIndex(IMG_HEIGHT);
+        int imgWidthIndex = cursor.getColumnIndex(IMG_WIDTH);
 
         data.setId(cursor.getInt(idShotIndex));
         data.setTitle(cursor.getString(titleIndex));
@@ -73,6 +100,8 @@ public class DribbleDatabaseManager implements DatabaseKeys {
         data.setViewsCount(cursor.getInt(viewsIndex));
         data.setLikesCount(cursor.getInt(likesIndex));
         data.setCommentsCount(cursor.getInt(commentsIndex));
+        data.setHeight(cursor.getInt(imgHeightIndex));
+        data.setWidth(cursor.getInt(imgWidthIndex));
         data.setImages(new ShotImagesData(
                 cursor.getString(imgHDpiIndex)
                 , cursor.getString(imgNormalIndex)
@@ -88,6 +117,8 @@ public class DribbleDatabaseManager implements DatabaseKeys {
         contentValues.put(VIEWS, data.getViewsCount());
         contentValues.put(LIKES, data.getLikesCount());
         contentValues.put(COMMENTS, data.getCommentsCount());
+        contentValues.put(IMG_HEIGHT, data.getHeight());
+        contentValues.put(IMG_WIDTH ,data.getWidth());
 
         addContentValues(IMG_HI_DPI, data.getImages().getHiDpi(), contentValues);
         addContentValues(IMG_NORMAL, data.getImages().getNormal(), contentValues);

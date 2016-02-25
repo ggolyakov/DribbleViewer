@@ -14,10 +14,11 @@ public interface DatabaseKeys extends BaseColumns {
     String VIEWS        = "views";
     String LIKES        = "likes";
     String COMMENTS     = "comments";
-    String IMG_HI_DPI    = "img_hi_dpi";
-    String IMG_NORMAL    = "img_normal";
-    String IMG_TEASER    = "img_teaser";
-
+    String IMG_HI_DPI   = "img_hi_dpi";
+    String IMG_NORMAL   = "img_normal";
+    String IMG_TEASER   = "img_teaser";
+    String IMG_HEIGHT   = "img_height";
+    String IMG_WIDTH    = "img_width";
 
 
     String CREATE_ITEMS_TABLE = String.format(
@@ -31,7 +32,9 @@ public interface DatabaseKeys extends BaseColumns {
                     ",%8$s INTEGER" +                                       //COMMENTS
                     ",%9$s VARCHAR(255)" +                                   //IMG_HI_DPI
                     ",%10$s VARCHAR(255)" +                                  //IMG_NORMAL
-                    ",%11$s VARCHAR(255)" +                                  //IMG_TEASER
+                    ",%11$s VARCHAR(255)" +                                 //IMG_TEASER
+                    ",%12$s INTEGER" +                                      //IMG_HEIGHT
+                    ",%13$s INTEGER" +                                      //IMG_WIDTH
                     ")"
             , SHOTS_TABLE
             , _ID
@@ -44,5 +47,7 @@ public interface DatabaseKeys extends BaseColumns {
             , IMG_HI_DPI
             , IMG_NORMAL
             , IMG_TEASER
+            , IMG_HEIGHT
+            , IMG_WIDTH
     );
 }
