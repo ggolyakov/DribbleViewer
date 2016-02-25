@@ -3,7 +3,7 @@
                 android:id="@+id/rl_progress"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/white"
+                android:background="@android:color/transparent"
                 android:orientation="vertical">
 
     <ProgressBar
@@ -36,6 +36,15 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="24dp"
+            android:textColor="@android:color/tertiary_text_dark"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="24dp"
+            android:text="@string/field.swipe_to_update"
             android:textColor="@android:color/tertiary_text_dark"
             android:textSize="18sp"/>
 

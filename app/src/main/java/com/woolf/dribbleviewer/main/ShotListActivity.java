@@ -97,6 +97,8 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     }
 
     private void initAdapters() {
+        srlReload.setColorSchemeResources(R.color.colorAccent,R.color.colorPrimary);
+
         mListAdapter = new ShotsListAdapter();
         LinearLayoutManager manager = new LinearLayoutManager(DribbleApplication.APP_CONTEXT);
 
@@ -159,6 +161,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
 
     @Override
     public void onCompleted(int request_id, Pair object) {
+
         if(mDbRequestId == request_id){
             Log.e("TAG","DB onCompleted");
             if(object.getValue() == null){
@@ -170,6 +173,9 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
             }
         }
         if (mShotsRequestId == request_id) {
+            if(srlReload.isRefreshing()){
+                srlReload.setRefreshing(false);
+            }
             Log.e("TAG","SHOTS onCompleted");
             ArrayList<ShotData> data = (ArrayList<ShotData>) object.getValue();
             mListAdapter.setData(data);
@@ -179,15 +185,16 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
 
     @Override
     public void onError(int request_id, ErrorHandler error) {
-
+        if(srlReload.isRefreshing()){
+            srlReload.setRefreshing(false);
+        }
         if(mDbRequestId == request_id){
-            Log.e("TAG", "DB onError");
-            pbLoad.setVisibility(View.INVISIBLE);
-            llError.setVisibility(View.VISIBLE);
+            mShotsModel.load(RequestParams.getShotsParams());
         }
         if (mShotsRequestId == request_id) {
             pbLoad.setVisibility(View.INVISIBLE);
             llError.setVisibility(View.VISIBLE);
+            tvError.setText(error.getMessage());
         }
     }
 
@@ -213,6 +220,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
 
     @Override
     public void onRefresh() {
+        srlReload.setRefreshing(true);
         mDbModel.load();
 //        rvShots.setLayoutManager(new GridLayoutManager(DribbleApplication.APP_CONTEXT,2));
     }
