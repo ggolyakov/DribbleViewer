@@ -1,7 +1,5 @@
 package com.woolf.dribbleviewer.rest.models;
 
-import android.util.Log;
-
 import com.woolf.dribbleviewer.DribbleApplication;
 import com.woolf.dribbleviewer.db.DribbleDatabaseHelper;
 import com.woolf.dribbleviewer.models.ShotData;
@@ -81,13 +79,11 @@ public class ShotsModel extends BaseModel {
     }
 
     private void success(Pair<List<ShotData>> user) {
-        Log.e("REST","Success");
         onCompleted(user);
         clearRequestParams();
     }
 
     private void error(Throwable throwable) {
-        Log.e("REST","error");
         onError(throwable);
         clearRequestParams();
     }

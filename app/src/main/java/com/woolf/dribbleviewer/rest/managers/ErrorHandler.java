@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
+import javax.net.ssl.SSLException;
+
 import retrofit2.adapter.rxjava.HttpException;
 
 public class ErrorHandler {
@@ -44,6 +46,10 @@ public class ErrorHandler {
             } catch (IOException | JSONException e) {
                 mMessage = getMessage(R.string.error_default);
             }
+
+        } else if (throwable instanceof SSLException) {
+            mErrorCode = DEFAULT_EXCEPTION;
+            mMessage = getMessage(R.string.error_connect);
 
         } else {
             mErrorCode = DEFAULT_EXCEPTION;

@@ -5,6 +5,7 @@
                 android:layout_height="match_parent"
                 android:visibility="gone"
                 android:background="@color/transparent_black"
+                android:clickable="true"
                 android:orientation="vertical">
 
     <ProgressBar
@@ -45,7 +46,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="24dp"
-            android:text="@string/field.swipe_to_update"
+            android:text="@string/field.tap_to_update"
             android:textColor="@android:color/white"
             android:textSize="18sp"/>
 

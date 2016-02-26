@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -27,10 +26,12 @@ import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ShotListActivity extends BaseActivity implements IRestObserver, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String SHOT_LIST = "MainActivity.SHOT_LIST";
+    private static final String PAGE = "MainActivity.PAGE";
 
     @Bind(R.id.rv_main)
     RecyclerView rvShots;
@@ -72,19 +73,27 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     private void loadFromSavedInstanceState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             mShotList = savedInstanceState.getParcelableArrayList(SHOT_LIST);
+            mPage = savedInstanceState.getInt(PAGE);
         }
+    }
+
+    @OnClick(R.id.rl_progress)
+    void reload() {
+        mShotsModel.load(mPage);
     }
 
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList(SHOT_LIST, mShotList);
+        outState.putInt(PAGE, mPage);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         mShotList = savedInstanceState.getParcelableArrayList(SHOT_LIST);
+        mPage = savedInstanceState.getInt(PAGE);
         super.onRestoreInstanceState(savedInstanceState);
     }
 
@@ -100,8 +109,6 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
 
     private void reloadList() {
         mPage = 1;
-//        srlReload.setRefreshing(true);
-        setRefreshing(true);
         mShotsModel.load(mPage);
     }
 
@@ -123,7 +130,6 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         if (mShotList == null) {
             mShotList = new ArrayList<>();
         }
-
         return mShotList;
     }
 
@@ -173,16 +179,14 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
             pbLoad.setVisibility(View.VISIBLE);
             llError.setVisibility(View.GONE);
         }else {
-            if(mPage == 1){
-                setRefreshing(true);
-            }
+            setRefreshing(true);
+            rlProgress.setVisibility(View.GONE);
+            llError.setVisibility(View.GONE);
         }
     }
 
     private void showErrorMessage(String error) {
-        if (srlReload.isRefreshing()) {
-            setRefreshing(false);
-        }
+        setRefreshing(false);
         rlProgress.setVisibility(View.VISIBLE);
         pbLoad.setVisibility(View.GONE);
         llError.setVisibility(View.VISIBLE);
@@ -192,16 +196,12 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     private void goneProgressBar() {
         rvShots.setVisibility(View.VISIBLE);
         rlProgress.setVisibility(View.GONE);
-        if (srlReload.isRefreshing()) {
-            srlReload.setRefreshing(false);
-        }
+        setRefreshing(false);
     }
 
     @Override
     public void onCompleted(int request_id, Pair object) {
-
         if (Constants.DB_REQUEST_ID == request_id) {
-            Log.e("TAG","DB onCompleted");
             if(object.getValue() == null){
                 mShotsModel.load(mPage);
             }else {
@@ -211,7 +211,6 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
             }
         }
         if (Constants.SHOTS_REQUEST_ID == request_id) {
-            Log.e("TAG","SHOTS onCompleted");
             if(mPage == 1){
                 clearList();
             }
@@ -236,13 +235,14 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     public void onChangeStatus(int request_id, Status status) {
 
         if (Constants.DB_REQUEST_ID == request_id) {
-            Log.e("TAG", "DB onChangeStatus");
             switch (status) {
                 case DO_NO_LOAD:
                     mDbModel.load();
                     break;
                 case LOADING_IS_COMPLETE:
-
+                    if (getShotList().isEmpty()) {
+                        reloadList();
+                    }
                     break;
 
                 case IN_PROGRESS:
@@ -255,7 +255,6 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
             }
         }
         if (Constants.SHOTS_REQUEST_ID == request_id) {
-            Log.e("TAG", "SHOTS onChangeStatus");
             switch (status) {
                 case DO_NO_LOAD:
 
