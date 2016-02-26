@@ -1,8 +1,6 @@
 package com.woolf.dribbleviewer.rest.results;
 
-/**
- * Created by woolf on 12.02.16.
- */
+
 public class Pair<T> {
 
     private T mValue;

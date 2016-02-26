@@ -33,10 +33,6 @@ public class RequestManagerFragment extends Fragment {
         return mShotsModel;
     }
 
-    public void destroySignInModel() {
-        mShotsModel = null;
-    }
-
     /**
      * DataBase
      */
@@ -45,10 +41,6 @@ public class RequestManagerFragment extends Fragment {
             mDBModel = new DataBaseModel(Constants.DB_REQUEST_ID);
         }
         return mDBModel;
-    }
-
-    public void destroyDBInModel() {
-        mDBModel = null;
     }
 
 

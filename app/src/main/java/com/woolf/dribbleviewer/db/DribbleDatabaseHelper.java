@@ -35,7 +35,7 @@ public class DribbleDatabaseHelper extends SQLiteOpenHelper implements DatabaseK
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int j) {
 
     }
 
@@ -52,7 +52,7 @@ public class DribbleDatabaseHelper extends SQLiteOpenHelper implements DatabaseK
         return DribbleDatabaseManager.getList(mInstance);
     }
 
-    public void clearShotsTabe(){
+    public void clearShotsTable(){
          DribbleDatabaseManager.clearTable(mInstance);
     }
 

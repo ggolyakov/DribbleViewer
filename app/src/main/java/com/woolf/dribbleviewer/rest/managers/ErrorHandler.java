@@ -1,7 +1,5 @@
 package com.woolf.dribbleviewer.rest.managers;
 
-import android.util.Log;
-
 import com.woolf.dribbleviewer.DribbleApplication;
 import com.woolf.dribbleviewer.R;
 
@@ -16,34 +14,40 @@ import retrofit2.adapter.rxjava.HttpException;
 
 public class ErrorHandler {
 
+    public static final int UNKNOWN_HOST_EXCEPTION   = 500;
+    public static final int SOCKET_TIMEOUT_EXCEPTION = 408;
+    public static final int DEFAULT_EXCEPTION        = 0;
+
+    private static final String MESSAGE = "message";
+
     private int mErrorCode;
     private String mMessage;
 
 
+
+
     public ErrorHandler(Throwable throwable) {
         if (throwable instanceof UnknownHostException) {
-            Log.e("REST", "UnknownHostException");
-            mErrorCode = 1;
-            mMessage = DribbleApplication.APP_CONTEXT.getString(R.string.error_connect);
+            mErrorCode = UNKNOWN_HOST_EXCEPTION;
+            mMessage = getMessage(R.string.error_connect);
         } else if (throwable instanceof SocketTimeoutException) {
-            Log.e("REST", "SocketTimeoutException");
-            mErrorCode = 2;
-            mMessage = DribbleApplication.APP_CONTEXT.getString(R.string.error_timeout);
+            mErrorCode = SOCKET_TIMEOUT_EXCEPTION;
+            mMessage = getMessage(R.string.error_timeout);
         } else if (throwable instanceof HttpException) {
             mErrorCode = ((HttpException) throwable).code();
             try {
                 String json = ((HttpException) throwable).response().errorBody().string();
                 JSONObject object = new JSONObject(json);
-                if (object.has("message") && object.isNull("message")) {
-                    mMessage = object.getString("message");
+                if (object.has(MESSAGE) && object.isNull(MESSAGE)) {
+                    mMessage = object.getString(MESSAGE);
                 }
             } catch (IOException | JSONException e) {
-                mMessage = DribbleApplication.APP_CONTEXT.getString(R.string.error_default);
+                mMessage = getMessage(R.string.error_default);
             }
 
         } else {
-            mErrorCode = 0;
-            mMessage = DribbleApplication.APP_CONTEXT.getString(R.string.error_default);
+            mErrorCode = DEFAULT_EXCEPTION;
+            mMessage = getMessage(R.string.error_default);
         }
     }
 
@@ -61,5 +65,9 @@ public class ErrorHandler {
 
     public void setMessage(String message) {
         mMessage = message;
+    }
+
+    private String getMessage(int resId){
+        return DribbleApplication.APP_CONTEXT.getString(resId);
     }
 }

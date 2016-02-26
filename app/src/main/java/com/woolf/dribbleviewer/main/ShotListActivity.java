@@ -31,9 +31,6 @@ import butterknife.ButterKnife;
 public class ShotListActivity extends BaseActivity implements IRestObserver, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String SHOT_LIST = "MainActivity.SHOT_LIST";
-    private static final String SHOT_REQUEST_ID = "MainActivity.SHOT_REQUEST_ID";
-    private static final String DB_REQUEST_ID = "MainActivity.DB_REQUEST_ID";
-
 
     @Bind(R.id.rv_main)
     RecyclerView rvShots;
@@ -56,8 +53,6 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
 
     private ShotsListAdapter mListAdapter;
 
-    private int mColumn;
-
     private int mPage = 1;
 
     @Override
@@ -65,16 +60,19 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shot_list);
         ButterKnife.bind(this);
-        if (savedInstanceState != null) {
-            mShotList = savedInstanceState.getParcelableArrayList(SHOT_LIST);
-        }
+        loadFromSavedInstanceState(savedInstanceState);
         getShotList();
 
         subscribe();
-        getColumn();
         initAdapters();
         setListeners();
 
+    }
+
+    private void loadFromSavedInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            mShotList = savedInstanceState.getParcelableArrayList(SHOT_LIST);
+        }
     }
 
 
@@ -94,7 +92,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         srlReload.setColorSchemeResources(R.color.colorAccent,R.color.colorPrimary);
 
         mListAdapter = new ShotsListAdapter(getShotList());
-        GridLayoutManager manager = new GridLayoutManager(DribbleApplication.APP_CONTEXT, mColumn);
+        GridLayoutManager manager = new GridLayoutManager(DribbleApplication.APP_CONTEXT, getColumn());
 
         rvShots.setAdapter(mListAdapter);
         rvShots.setLayoutManager(manager);
@@ -102,8 +100,13 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
 
     private void reloadList() {
         mPage = 1;
-        srlReload.setRefreshing(true);
+//        srlReload.setRefreshing(true);
+        setRefreshing(true);
         mShotsModel.load(mPage);
+    }
+
+    private void setRefreshing(boolean isRefreshing){
+        srlReload.post(() -> srlReload.setRefreshing(isRefreshing));
     }
 
     private void fillList(ArrayList<ShotData> data) {
@@ -138,8 +141,8 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         mDbModel.deleteObserver(this);
     }
 
-    private void getColumn() {
-        mColumn = getResources().getInteger(R.integer.shots_column);
+    private int getColumn() {
+        return getResources().getInteger(R.integer.shots_column);
     }
 
     private void setListeners(){
@@ -169,10 +172,17 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
             rlProgress.setVisibility(View.VISIBLE);
             pbLoad.setVisibility(View.VISIBLE);
             llError.setVisibility(View.GONE);
+        }else {
+            if(mPage == 1){
+                setRefreshing(true);
+            }
         }
     }
 
     private void showErrorMessage(String error) {
+        if (srlReload.isRefreshing()) {
+            setRefreshing(false);
+        }
         rlProgress.setVisibility(View.VISIBLE);
         pbLoad.setVisibility(View.GONE);
         llError.setVisibility(View.VISIBLE);
@@ -215,12 +225,9 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     @Override
     public void onError(int request_id, ErrorHandler error) {
         if (Constants.DB_REQUEST_ID == request_id) {
-            mShotsModel.load(mPage);
+            reloadList();
         }
         if (Constants.SHOTS_REQUEST_ID == request_id) {
-            if (srlReload.isRefreshing()) {
-                srlReload.setRefreshing(false);
-            }
             showErrorMessage(error.getMessage());
         }
     }

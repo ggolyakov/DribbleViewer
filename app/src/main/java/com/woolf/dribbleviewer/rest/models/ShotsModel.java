@@ -6,6 +6,7 @@ import com.woolf.dribbleviewer.DribbleApplication;
 import com.woolf.dribbleviewer.db.DribbleDatabaseHelper;
 import com.woolf.dribbleviewer.models.ShotData;
 import com.woolf.dribbleviewer.rest.ApiFactory;
+import com.woolf.dribbleviewer.rest.params.Constants;
 import com.woolf.dribbleviewer.rest.params.RequestParams;
 import com.woolf.dribbleviewer.rest.results.Pair;
 import com.woolf.dribbleviewer.rest.service.ShotsService;
@@ -28,10 +29,10 @@ public class ShotsModel extends BaseModel {
 
     private Pair<List<ShotData>> saveList(List<ShotData> result) {
         if (mPage == 1) {
-            DribbleDatabaseHelper.getInstance(DribbleApplication.APP_CONTEXT).clearShotsTabe();
+            DribbleDatabaseHelper.getInstance(DribbleApplication.APP_CONTEXT).clearShotsTable();
         }
         DribbleDatabaseHelper.getInstance(DribbleApplication.APP_CONTEXT).addValues(result);
-        return new Pair<>(result, null);
+        return new Pair<>(result, Constants.SUCCESS);
     }
 
     private List<ShotData> filter(List<ShotData> shotDataList) {

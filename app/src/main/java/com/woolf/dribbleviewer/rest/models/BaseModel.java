@@ -42,9 +42,7 @@ public abstract class BaseModel {
         mRestObservers.remove(observer);
     }
 
-    /**
-     * Removes all observers from the list of observers.
-     */
+
     public synchronized void deleteObservers() {
         mRestObservers.clear();
     }

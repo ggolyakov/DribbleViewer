@@ -18,6 +18,9 @@ public interface DatabaseKeys extends BaseColumns {
     String IMG_WIDTH    = "img_width";
 
 
+    /**
+     * Create shots table
+     */
     String CREATE_SHOTS_TABLE = String.format(
             "CREATE TABLE %1$s (" +                                         //SHOTS_TABLE
                     " %2$s INTEGER PRIMARY KEY  AUTOINCREMENT" +            //_ID

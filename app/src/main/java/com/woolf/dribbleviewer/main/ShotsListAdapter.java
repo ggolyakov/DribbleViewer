@@ -57,13 +57,10 @@ public class ShotsListAdapter extends RecyclerView.Adapter<ShotsListAdapter.View
         if(data.getDescription() != null){
             holder.tvDescription.setText(Html.fromHtml(data.getDescription()));
         }else {
-            holder.tvDescription.setText("");
+            holder.tvDescription.setVisibility(View.GONE);
         }
 
         showImage(holder.sdvImage, data);
-//        holder.tvLikesCount.setText(String.valueOf(data.getLikesCount()));
-//        holder.tvCommentsCount.setText(String.valueOf(data.getCommentsCount()));
-//        holder.tvViewsCount.setText(String.valueOf(data.getViewsCount()));
 
     }
 
@@ -86,9 +83,6 @@ public class ShotsListAdapter extends RecyclerView.Adapter<ShotsListAdapter.View
         SimpleDraweeView sdvImage;
         TextView tvDescription;
 
-//        TextView tvLikesCount;
-//        TextView tvCommentsCount;
-//        TextView tvViewsCount;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -105,9 +99,6 @@ public class ShotsListAdapter extends RecyclerView.Adapter<ShotsListAdapter.View
             tvTitle = (TextView) view.findViewById(R.id.tv_row_dribble_title);
             sdvImage = (SimpleDraweeView) view.findViewById(R.id.sdv_row_dribble_image);
             tvDescription = (TextView) view.findViewById(R.id.tv_row_dribble_description);
-//            tvLikesCount = (TextView) view.findViewById(R.id.tv_row_dribble_likes_count);
-//            tvCommentsCount = (TextView) view.findViewById(R.id.tv_row_dribble_comments_count);
-//            tvViewsCount = (TextView) view.findViewById(R.id.tv_row_dribble_views_count);
 
         }
     }

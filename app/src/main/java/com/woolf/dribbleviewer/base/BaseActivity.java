@@ -7,28 +7,29 @@ import com.woolf.dribbleviewer.rest.managers.RequestManagerFragment;
 
 public class BaseActivity extends AppCompatActivity {
 
-    private RequestManagerFragment mStorageFragment;
+    private RequestManagerFragment mRequestFragment;
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (isFinishing()) {
-            mStorageFragment = null;
+            mRequestFragment = null;
         }
     }
 
+
     protected RequestManagerFragment getRequestFragment() {
-        if (mStorageFragment != null) {
-            return mStorageFragment;
+        if (mRequestFragment != null) {
+            return mRequestFragment;
         } else {
             if (getFragmentManager().findFragmentByTag(RequestManagerFragment.TAG) != null) {
-                mStorageFragment = (RequestManagerFragment) getFragmentManager().findFragmentByTag(RequestManagerFragment.TAG);
-                return mStorageFragment;
+                mRequestFragment = (RequestManagerFragment) getFragmentManager().findFragmentByTag(RequestManagerFragment.TAG);
+                return mRequestFragment;
             } else {
-                mStorageFragment = new RequestManagerFragment();
-                getFragmentManager().beginTransaction().add(mStorageFragment, RequestManagerFragment.TAG).commit();
-                return mStorageFragment;
+                mRequestFragment = new RequestManagerFragment();
+                getFragmentManager().beginTransaction().add(mRequestFragment, RequestManagerFragment.TAG).commit();
+                return mRequestFragment;
             }
         }
     }

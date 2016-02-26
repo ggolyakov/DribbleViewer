@@ -5,6 +5,7 @@ import android.util.Log;
 import com.woolf.dribbleviewer.DribbleApplication;
 import com.woolf.dribbleviewer.db.DribbleDatabaseHelper;
 import com.woolf.dribbleviewer.models.ShotData;
+import com.woolf.dribbleviewer.rest.params.Constants;
 import com.woolf.dribbleviewer.rest.results.Pair;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class DataBaseModel extends BaseModel {
     }
 
     private Pair<List<ShotData>> convert(List<ShotData> list){
-        return new Pair<>(list,"success");
+        return new Pair<>(list, Constants.SUCCESS);
     }
 
 
