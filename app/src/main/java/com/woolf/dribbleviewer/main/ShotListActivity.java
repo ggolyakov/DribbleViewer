@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.woolf.dribbleviewer.DribbleApplication;
 import com.woolf.dribbleviewer.R;
 import com.woolf.dribbleviewer.base.BaseActivity;
+import com.woolf.dribbleviewer.controls.EndlessRecyclerViewAdapter;
 import com.woolf.dribbleviewer.models.ShotData;
 import com.woolf.dribbleviewer.rest.listeners.IRestObserver;
 import com.woolf.dribbleviewer.rest.listeners.Status;
@@ -28,7 +29,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ShotListActivity extends BaseActivity implements IRestObserver, SwipeRefreshLayout.OnRefreshListener {
+public class ShotListActivity extends BaseActivity implements IRestObserver, SwipeRefreshLayout.OnRefreshListener,
+        EndlessRecyclerViewAdapter.RequestToLoadMoreListener{
 
     private static final String SHOT_LIST = "MainActivity.SHOT_LIST";
     private static final String PAGE = "MainActivity.PAGE";
@@ -53,6 +55,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     private ArrayList<ShotData> mShotList;
 
     private ShotsListAdapter mListAdapter;
+    private EndlessRecyclerViewAdapter mEndlessRecyclerViewAdapter;
 
     private int mPage = 1;
 
@@ -101,9 +104,10 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         srlReload.setColorSchemeResources(R.color.colorAccent,R.color.colorPrimary);
 
         mListAdapter = new ShotsListAdapter(getShotList());
+        mEndlessRecyclerViewAdapter = new EndlessRecyclerViewAdapter(this, mListAdapter, this);
         GridLayoutManager manager = new GridLayoutManager(DribbleApplication.APP_CONTEXT, getColumn());
 
-        rvShots.setAdapter(mListAdapter);
+        rvShots.setAdapter(mEndlessRecyclerViewAdapter);
         rvShots.setLayoutManager(manager);
     }
 
@@ -194,6 +198,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         pbLoad.setVisibility(View.GONE);
         llError.setVisibility(View.VISIBLE);
         tvError.setText(error);
+        mEndlessRecyclerViewAdapter.onDataReady(true);
     }
 
     private void goneProgressBar() {
@@ -211,6 +216,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
                 ArrayList<ShotData> data = (ArrayList<ShotData>) object.getValue();
                 fillList(data);
                 goneProgressBar();
+                mEndlessRecyclerViewAdapter.onDataReady(false);
             }
         }
         if (Constants.SHOTS_REQUEST_ID == request_id) {
@@ -280,5 +286,10 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     @Override
     public void onRefresh() {
         reloadList();
+    }
+
+    @Override
+    public void onLoadMoreRequested() {
+        mShotsModel.load(mPage);
     }
 }
