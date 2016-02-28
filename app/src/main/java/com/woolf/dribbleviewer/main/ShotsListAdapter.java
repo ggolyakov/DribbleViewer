@@ -18,20 +18,10 @@ import java.util.ArrayList;
 
 public class ShotsListAdapter extends RecyclerView.Adapter<ShotsListAdapter.ViewHolder> {
 
-    OnItemClickListener mItemClickListener;
     private ArrayList<ShotData> mShotList;
-
 
     public ShotsListAdapter(ArrayList<ShotData> data) {
         mShotList = data;
-    }
-
-    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
-        this.mItemClickListener = mItemClickListener;
-    }
-
-    public void notyfiChanged() {
-        notifyDataSetChanged();
     }
 
 
@@ -73,11 +63,8 @@ public class ShotsListAdapter extends RecyclerView.Adapter<ShotsListAdapter.View
         }
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(View view, int position);
-    }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout llContainer;
         TextView tvTitle;
         SimpleDraweeView sdvImage;
@@ -89,10 +76,7 @@ public class ShotsListAdapter extends RecyclerView.Adapter<ShotsListAdapter.View
             initViews(itemView);
         }
 
-        @Override
-        public void onClick(View v) {
 
-        }
 
         private void initViews(View view) {
             llContainer = (LinearLayout) view.findViewById(R.id.ll_row_dribble_container);

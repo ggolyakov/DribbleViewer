@@ -112,6 +112,9 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         mShotsModel.load(mPage);
     }
 
+
+     // https://code.google.com/p/android/issues/detail?id=77712
+
     private void setRefreshing(boolean isRefreshing){
         srlReload.post(() -> srlReload.setRefreshing(isRefreshing));
     }

@@ -15,8 +15,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiFactory {
     private static final int CONNECT_TIMEOUT = 15;
-    private static final int WRITE_TIMEOUT = 60;
-    private static final int TIMEOUT = 60;
+    private static final int WRITE_TIMEOUT = 30;
+    private static final int TIMEOUT = 30;
 
     private static final OkHttpClient CLIENT = getOkHttpClient(BuildConfig.ACCESS_TOKEN);
 

@@ -78,8 +78,8 @@ public class ShotsModel extends BaseModel {
         mObservable = null;
     }
 
-    private void success(Pair<List<ShotData>> user) {
-        onCompleted(user);
+    private void success(Pair<List<ShotData>> shotList) {
+        onCompleted(shotList);
         clearRequestParams();
     }
 
