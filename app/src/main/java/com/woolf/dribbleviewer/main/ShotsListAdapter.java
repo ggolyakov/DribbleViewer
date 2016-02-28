@@ -15,13 +15,18 @@ import com.woolf.dribbleviewer.R;
 import com.woolf.dribbleviewer.models.ShotData;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ShotsListAdapter extends RecyclerView.Adapter<ShotsListAdapter.ViewHolder> {
 
     private ArrayList<ShotData> mShotList;
 
     public ShotsListAdapter(ArrayList<ShotData> data) {
-        mShotList = data;
+        if(data == null){
+            mShotList = new ArrayList<>();
+        }else {
+            mShotList = data;
+        }
     }
 
 
@@ -39,8 +44,21 @@ public class ShotsListAdapter extends RecyclerView.Adapter<ShotsListAdapter.View
 
     @Override
     public int getItemCount() {
-        return mShotList == null ? 0 : mShotList.size();
+        return mShotList.size();
     }
+
+    public void apendItems(List<ShotData> data){
+        mShotList.addAll(data);
+        notifyItemRangeInserted(getItemCount(),data.size());
+
+    }
+
+    public void clearList(){
+        mShotList.clear();
+        notifyItemRangeRemoved(getItemCount(),mShotList.size());
+    }
+
+
 
     private void fillView(ViewHolder holder, ShotData data) {
         holder.tvTitle.setText(data.getTitle());

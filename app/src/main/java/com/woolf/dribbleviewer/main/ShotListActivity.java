@@ -29,11 +29,15 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ShotListActivity extends BaseActivity implements IRestObserver, SwipeRefreshLayout.OnRefreshListener,
-        EndlessRecyclerViewAdapter.RequestToLoadMoreListener{
+public class ShotListActivity extends BaseActivity implements IRestObserver, SwipeRefreshLayout.OnRefreshListener ,EndlessRecyclerViewAdapter.RequestToLoadMoreListener{
 
     private static final String SHOT_LIST = "MainActivity.SHOT_LIST";
     private static final String PAGE = "MainActivity.PAGE";
+    private static final String TYPE_LOAD = "MainActivity.TYPE_LOAD";
+
+    private static final int TYPE_FIRST_LOAD = 0;
+    private static final int TYPE_RELOAD = 1;
+    private static final int TYPE_LOAD_MORE = 2;
 
     @Bind(R.id.rv_main)
     RecyclerView rvShots;
@@ -58,6 +62,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     private EndlessRecyclerViewAdapter mEndlessRecyclerViewAdapter;
 
     private int mPage = 1;
+    private int mTypeLoad = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,23 +70,25 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         setContentView(R.layout.activity_shot_list);
         ButterKnife.bind(this);
         loadFromSavedInstanceState(savedInstanceState);
-        getShotList();
 
         subscribe();
         initAdapters();
         setListeners();
-
     }
 
-    private void loadFromSavedInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            mShotList = savedInstanceState.getParcelableArrayList(SHOT_LIST);
-            mPage = savedInstanceState.getInt(PAGE);
-        }
+    @Override
+    protected void onDestroy() {
+        unsubscribe();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onRefresh() {
+        reloadList();
     }
 
     @OnClick(R.id.rl_progress)
-    void reload() {
+    void tryAgain() {
         mShotsModel.load(mPage);
     }
 
@@ -90,6 +97,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList(SHOT_LIST, mShotList);
         outState.putInt(PAGE, mPage);
+        outState.putInt(TYPE_LOAD, mTypeLoad);
         super.onSaveInstanceState(outState);
     }
 
@@ -97,47 +105,16 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         mShotList = savedInstanceState.getParcelableArrayList(SHOT_LIST);
         mPage = savedInstanceState.getInt(PAGE);
+        mTypeLoad = savedInstanceState.getInt(TYPE_LOAD);
         super.onRestoreInstanceState(savedInstanceState);
     }
 
-    private void initAdapters() {
-        srlReload.setColorSchemeResources(R.color.colorAccent,R.color.colorPrimary);
-
-        mListAdapter = new ShotsListAdapter(getShotList());
-        mEndlessRecyclerViewAdapter = new EndlessRecyclerViewAdapter(this, mListAdapter, this);
-        GridLayoutManager manager = new GridLayoutManager(DribbleApplication.APP_CONTEXT, getColumn());
-
-        rvShots.setAdapter(mEndlessRecyclerViewAdapter);
-        rvShots.setLayoutManager(manager);
-    }
-
-    private void reloadList() {
-        mPage = 1;
-        mShotsModel.load(mPage);
-    }
-
-
-     // https://code.google.com/p/android/issues/detail?id=77712
-
-    private void setRefreshing(boolean isRefreshing){
-        srlReload.post(() -> srlReload.setRefreshing(isRefreshing));
-    }
-
-    private void fillList(ArrayList<ShotData> data) {
-        getShotList().addAll(data);
-        mListAdapter.notifyDataSetChanged();
-    }
-
-    private void clearList() {
-        getShotList().clear();
-        mListAdapter.notifyDataSetChanged();
-    }
-
-    private ArrayList<ShotData> getShotList() {
-        if (mShotList == null) {
-            mShotList = new ArrayList<>();
+    private void loadFromSavedInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            mShotList = savedInstanceState.getParcelableArrayList(SHOT_LIST);
+            mPage = savedInstanceState.getInt(PAGE);
+            mTypeLoad = savedInstanceState.getInt(TYPE_LOAD);
         }
-        return mShotList;
     }
 
 
@@ -154,142 +131,173 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         mDbModel.deleteObserver(this);
     }
 
-    private int getColumn() {
-        return getResources().getInteger(R.integer.shots_column);
+
+    private void initAdapters() {
+        srlReload.setColorSchemeResources(R.color.colorAccent,R.color.colorPrimary);
+
+        mListAdapter = new ShotsListAdapter(mShotList);
+        mEndlessRecyclerViewAdapter = new EndlessRecyclerViewAdapter(this,mListAdapter,this);
+        GridLayoutManager manager = new GridLayoutManager(DribbleApplication.APP_CONTEXT, getResources().getInteger(R.integer.shots_column));
+        rvShots.setAdapter(mEndlessRecyclerViewAdapter);
+        rvShots.setLayoutManager(manager);
+        mEndlessRecyclerViewAdapter.onDataReady(false);
     }
 
-    private void setListeners(){
+    private void setListeners() {
         srlReload.setOnRefreshListener(this);
-
     }
 
-    @Override
-    protected void onDestroy() {
-        unsubscribe();
-        super.onDestroy();
+
+    private void reloadList() {
+        mPage = 1;
+        load(TYPE_RELOAD);
     }
+
+    private void load(int type){
+        mTypeLoad = type;
+        mShotsModel.load(mPage);
+    }
+
+
+     // https://code.google.com/p/android/issues/detail?id=77712
+    private void setRefreshing(boolean isRefreshing){
+        srlReload.post(() -> srlReload.setRefreshing(isRefreshing));
+    }
+
+    private void fillList(Pair object) {
+        ArrayList<ShotData> data = (ArrayList<ShotData>) object.getValue();
+        if (mTypeLoad == TYPE_RELOAD) {
+            mListAdapter.clearList();
+        }
+        mListAdapter.apendItems(data);
+    }
+
 
     @Override
     public void onStartLoading(int request_id) {
-        if (Constants.DB_REQUEST_ID == request_id) {
-            showProgressBar();
+        switch (request_id) {
+            case Constants.DB_REQUEST_ID:
+                showProgressBar();
+                break;
+
+            case Constants.SHOTS_REQUEST_ID:
+                showProgressBar();
+                break;
         }
-        if (Constants.SHOTS_REQUEST_ID == request_id) {
-            showProgressBar();
-        }
 
-    }
-
-    private void showProgressBar() {
-        if (mShotList == null || mShotList.isEmpty()) {
-            rlProgress.setVisibility(View.VISIBLE);
-            pbLoad.setVisibility(View.VISIBLE);
-            llError.setVisibility(View.GONE);
-        }else {
-            setRefreshing(true);
-            rlProgress.setVisibility(View.GONE);
-            llError.setVisibility(View.GONE);
-        }
-    }
-
-    private void showErrorMessage(String error) {
-        setRefreshing(false);
-        rlProgress.setVisibility(View.VISIBLE);
-        pbLoad.setVisibility(View.GONE);
-        llError.setVisibility(View.VISIBLE);
-        tvError.setText(error);
-        mEndlessRecyclerViewAdapter.onDataReady(true);
-    }
-
-    private void goneProgressBar() {
-        rvShots.setVisibility(View.VISIBLE);
-        rlProgress.setVisibility(View.GONE);
-        setRefreshing(false);
     }
 
     @Override
     public void onCompleted(int request_id, Pair object) {
-        if (Constants.DB_REQUEST_ID == request_id) {
-            if(object.getValue() == null){
-                mShotsModel.load(mPage);
-            }else {
-                ArrayList<ShotData> data = (ArrayList<ShotData>) object.getValue();
-                fillList(data);
+        switch (request_id) {
+            case Constants.DB_REQUEST_ID:
+                if (object.getValue() == null) {
+                    load(TYPE_FIRST_LOAD);
+                } else {
+                    fillList(object);
+                    goneProgressBar();
+                }
+                break;
+
+            case Constants.SHOTS_REQUEST_ID:
+                fillList(object);
                 goneProgressBar();
-                mEndlessRecyclerViewAdapter.onDataReady(false);
-            }
-        }
-        if (Constants.SHOTS_REQUEST_ID == request_id) {
-            if(mPage == 1){
-                clearList();
-            }
-            ArrayList<ShotData> data = (ArrayList<ShotData>) object.getValue();
-            fillList(data);
-            mPage++;
-            goneProgressBar();
+                mEndlessRecyclerViewAdapter.onDataReady(true);
+                mPage++;
+                break;
         }
     }
 
     @Override
     public void onError(int request_id, ErrorHandler error) {
-        if (Constants.DB_REQUEST_ID == request_id) {
-            reloadList();
+        switch (request_id) {
+            case Constants.DB_REQUEST_ID:
+                reloadList();
+                break;
+
+            case Constants.SHOTS_REQUEST_ID:
+                showErrorMessage(error.getMessage());
+                break;
         }
-        if (Constants.SHOTS_REQUEST_ID == request_id) {
-            showErrorMessage(error.getMessage());
-        }
+
     }
 
     @Override
     public void onChangeStatus(int request_id, Status status) {
-
         if (Constants.DB_REQUEST_ID == request_id) {
             switch (status) {
                 case DO_NO_LOAD:
                     mDbModel.load();
                     break;
-                case LOADING_IS_COMPLETE:
-                    if (getShotList().isEmpty()) {
-                        reloadList();
-                    }
-                    break;
+//                case LOADING_IS_COMPLETE:
+//                    if (getShotList().isEmpty()) {
+//                        reloadList();
+//                    }
+//                    break;
 
                 case IN_PROGRESS:
                     showProgressBar();
-                    break;
-
-                case LOADING_ERROR:
-
                     break;
             }
         }
         if (Constants.SHOTS_REQUEST_ID == request_id) {
             switch (status) {
-                case DO_NO_LOAD:
-
-                    break;
-                case LOADING_IS_COMPLETE:
-
-                    break;
-
                 case IN_PROGRESS:
                     showProgressBar();
-                    break;
-
-                case LOADING_ERROR:
-
                     break;
             }
         }
     }
 
-    @Override
-    public void onRefresh() {
-        reloadList();
+    private void showProgressBar() {
+
+        llError.setVisibility(View.GONE);
+
+        switch (mTypeLoad) {
+            case TYPE_FIRST_LOAD:
+                pbLoad.setVisibility(View.VISIBLE);
+                break;
+
+            case TYPE_RELOAD:
+                setRefreshing(true);
+                rlProgress.setVisibility(View.GONE);
+                break;
+        }
+    }
+
+    private void showErrorMessage(String error) {
+        rlProgress.setVisibility(View.VISIBLE);
+        llError.setVisibility(View.VISIBLE);
+        tvError.setText(error);
+
+        switch (mTypeLoad) {
+            case TYPE_FIRST_LOAD:
+                pbLoad.setVisibility(View.GONE);
+                break;
+
+            case TYPE_RELOAD:
+                setRefreshing(false);
+                break;
+        }
+    }
+
+    private void goneProgressBar() {
+        switch (mTypeLoad) {
+            case TYPE_RELOAD:
+                setRefreshing(false);
+                break;
+
+            case TYPE_FIRST_LOAD:
+                rlProgress.setVisibility(View.GONE);
+                break;
+        }
+
+        rvShots.setVisibility(View.VISIBLE);
+
     }
 
     @Override
     public void onLoadMoreRequested() {
-        mShotsModel.load(mPage);
+
     }
 }
