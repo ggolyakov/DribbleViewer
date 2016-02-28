@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class RequestParams {
 
-    private static final int COUNT_SHOTS = 10;
+    private static final int COUNT_SHOTS = 20;
 
     public static HashMap<String, String> getShotsParams(int page) {
         HashMap<String, String> params = new HashMap<>(3);
