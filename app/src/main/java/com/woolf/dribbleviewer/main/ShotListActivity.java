@@ -34,6 +34,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
     private static final String SHOT_LIST = "MainActivity.SHOT_LIST";
     private static final String PAGE = "MainActivity.PAGE";
     private static final String TYPE_LOAD = "MainActivity.TYPE_LOAD";
+    private static final String IS_LOAD_MORE = "MainActivity.IS_LOAD_MORE";
 
     private static final int TYPE_FIRST_LOAD = 0;
     private static final int TYPE_RELOAD = 1;
@@ -63,6 +64,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
 
     private int mPage = 1;
     private int mTypeLoad = 0;
+    private boolean isLoadMore = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,9 +97,10 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList(SHOT_LIST, mShotList);
+        outState.putParcelableArrayList(SHOT_LIST, mListAdapter.getList());
         outState.putInt(PAGE, mPage);
         outState.putInt(TYPE_LOAD, mTypeLoad);
+        outState.putBoolean(IS_LOAD_MORE, isLoadMore);
         super.onSaveInstanceState(outState);
     }
 
@@ -106,6 +109,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         mShotList = savedInstanceState.getParcelableArrayList(SHOT_LIST);
         mPage = savedInstanceState.getInt(PAGE);
         mTypeLoad = savedInstanceState.getInt(TYPE_LOAD);
+        isLoadMore = savedInstanceState.getBoolean(IS_LOAD_MORE);
         super.onRestoreInstanceState(savedInstanceState);
     }
 
@@ -114,6 +118,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
             mShotList = savedInstanceState.getParcelableArrayList(SHOT_LIST);
             mPage = savedInstanceState.getInt(PAGE);
             mTypeLoad = savedInstanceState.getInt(TYPE_LOAD);
+            isLoadMore = savedInstanceState.getBoolean(IS_LOAD_MORE);
         }
     }
 
@@ -140,7 +145,7 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         GridLayoutManager manager = new GridLayoutManager(DribbleApplication.APP_CONTEXT, getResources().getInteger(R.integer.shots_column));
         rvShots.setAdapter(mEndlessRecyclerViewAdapter);
         rvShots.setLayoutManager(manager);
-        mEndlessRecyclerViewAdapter.onDataReady(false);
+        mEndlessRecyclerViewAdapter.onDataReady(isLoadMore);
     }
 
     private void setListeners() {
@@ -202,7 +207,8 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
             case Constants.SHOTS_REQUEST_ID:
                 fillList(object);
                 goneProgressBar();
-                mEndlessRecyclerViewAdapter.onDataReady(true);
+                isLoadMore = true;
+                mEndlessRecyclerViewAdapter.onDataReady(isLoadMore);
                 mPage++;
                 break;
         }
@@ -229,11 +235,6 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
                 case DO_NO_LOAD:
                     mDbModel.load();
                     break;
-//                case LOADING_IS_COMPLETE:
-//                    if (getShotList().isEmpty()) {
-//                        reloadList();
-//                    }
-//                    break;
 
                 case IN_PROGRESS:
                     showProgressBar();
@@ -256,10 +257,15 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         switch (mTypeLoad) {
             case TYPE_FIRST_LOAD:
                 pbLoad.setVisibility(View.VISIBLE);
+                rlProgress.setVisibility(View.VISIBLE);
                 break;
 
             case TYPE_RELOAD:
                 setRefreshing(true);
+                rlProgress.setVisibility(View.GONE);
+                break;
+
+            case TYPE_LOAD_MORE:
                 rlProgress.setVisibility(View.GONE);
                 break;
         }
@@ -269,16 +275,8 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         rlProgress.setVisibility(View.VISIBLE);
         llError.setVisibility(View.VISIBLE);
         tvError.setText(error);
-
-        switch (mTypeLoad) {
-            case TYPE_FIRST_LOAD:
-                pbLoad.setVisibility(View.GONE);
-                break;
-
-            case TYPE_RELOAD:
-                setRefreshing(false);
-                break;
-        }
+        setRefreshing(false);
+        pbLoad.setVisibility(View.GONE);
     }
 
     private void goneProgressBar() {
@@ -290,6 +288,10 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
             case TYPE_FIRST_LOAD:
                 rlProgress.setVisibility(View.GONE);
                 break;
+
+            case TYPE_LOAD_MORE:
+                rlProgress.setVisibility(View.GONE);
+                break;
         }
 
         rvShots.setVisibility(View.VISIBLE);
@@ -298,6 +300,6 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
 
     @Override
     public void onLoadMoreRequested() {
-
+        load(TYPE_LOAD_MORE);
     }
 }

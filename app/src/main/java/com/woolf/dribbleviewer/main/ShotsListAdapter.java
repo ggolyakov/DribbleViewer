@@ -29,6 +29,10 @@ public class ShotsListAdapter extends RecyclerView.Adapter<ShotsListAdapter.View
         }
     }
 
+    public ArrayList<ShotData> getList(){
+        return mShotList;
+    }
+
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
