@@ -250,8 +250,10 @@ public class ShotListActivity extends BaseActivity implements IRestObserver, Swi
         llError.setVisibility(View.GONE);
         if (getShotList().isEmpty()) {
             pbLoad.setVisibility(View.VISIBLE);
+            rlProgress.setVisibility(View.VISIBLE);
         } else {
             setRefreshing(true);
+            rlProgress.setVisibility(View.GONE);
         }
     }
 
